@@ -142,33 +142,35 @@ if(modalOverlay) modalOverlay.addEventListener('click', function(e){
 document.addEventListener('keydown', function(e){
   if(e.key === 'Escape') closeModal();
 });
-// Contact form submit -> mailto
-var contactForm = document.getElementById('contactForm'); if(contactForm) contactForm.addEventListener('submit', function(e){
+// Contact form submit -> EmailJS
+emailjs.init('nlyPz-J_9llBOMIOn');
+var contactForm = document.getElementById('contactForm');
+if(contactForm) contactForm.addEventListener('submit', function(e){
   e.preventDefault();
   var btn = this.querySelector('.form-submit');
   var status = document.getElementById('formStatus');
   var data = new FormData(this);
-  var name = data.get('name');
-  var email = data.get('email');
-  var company = data.get('company') || '-';
-  var project = data.get('project') || '-';
-  var message = data.get('message');
-  var subject = encodeURIComponent('Portfolio Inquiry from ' + name);
-  var body = encodeURIComponent(
-    'Name: ' + name + '\n' +
-    'Email: ' + email + '\n' +
-    'Company: ' + company + '\n' +
-    'Project: ' + project + '\n\n' +
-    'Message:\n' + message
-  );
-  var mailtoLink = 'mailto:fadhliardiansyah@gmail.com?subject=' + subject + '&body=' + body;
   btn.classList.add('loading');
-  btn.querySelector('.submit-text').textContent = 'Opening...';
-  setTimeout(function(){
-    window.location.href = mailtoLink;
+  btn.querySelector('.submit-text').textContent = 'Sending...';
+  status.className = 'form-status';
+  status.style.display = 'none';
+  emailjs.send('service_jsg8yed', 'template_c61ojyw', {
+    name: data.get('name'),
+    email: data.get('email'),
+    company: data.get('company') || '-',
+    project: data.get('project') || '-',
+    message: data.get('message')
+  }).then(function(){
     btn.classList.remove('loading');
     btn.querySelector('.submit-text').textContent = 'Send Message';
     status.className = 'form-status success';
-    status.textContent = '✓ Your email client has been opened. Please send the email to complete.';
-  }, 800);
+    status.textContent = '✓ Message sent! I\'ll get back to you within 24 hours.';
+    contactForm.reset();
+  }, function(error){
+    btn.classList.remove('loading');
+    btn.querySelector('.submit-text').textContent = 'Send Message';
+    status.className = 'form-status error';
+    status.textContent = '✗ Something went wrong. Please try again or email me directly.';
+    console.error('EmailJS error:', error);
+  });
 });
