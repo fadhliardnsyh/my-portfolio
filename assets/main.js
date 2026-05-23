@@ -163,14 +163,30 @@ if(contactForm) contactForm.addEventListener('submit', function(e){
   }).then(function(){
     btn.classList.remove('loading');
     btn.querySelector('.submit-text').textContent = 'Send Message';
-    status.className = 'form-status success';
-    status.textContent = '✓ Message sent! I\'ll get back to you within 24 hours.';
     contactForm.reset();
+    // Close contact modal, open success modal
+    closeModal();
+    setTimeout(function(){
+      document.getElementById('successModal').classList.add('open');
+    }, 300);
   }, function(error){
     btn.classList.remove('loading');
     btn.querySelector('.submit-text').textContent = 'Send Message';
     status.className = 'form-status error';
     status.textContent = '✗ Something went wrong. Please try again or email me directly.';
     console.error('EmailJS error:', error);
+  });
+});
+// Success modal
+document.addEventListener('DOMContentLoaded', function(){
+  var successClose = document.getElementById('successClose');
+  var successModal = document.getElementById('successModal');
+  function closeSuccess(){
+    if(successModal) successModal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  if(successClose) successClose.addEventListener('click', closeSuccess);
+  if(successModal) successModal.addEventListener('click', function(e){
+    if(e.target === this) closeSuccess();
   });
 });
